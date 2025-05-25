@@ -24,47 +24,11 @@ Built with Flask, this app lets you log in with your GitHub account, view all yo
 
 ---
 
-## 🌐 Live Demo
+## 🌐 Live Website
 
 [github-repo-manager-lemon.vercel.app](https://github-repo-manager-lemon.vercel.app)
 
 ---
-
-## 🚀 Getting Started (Local Development)
-
-1. **Clone the repo**
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-    cd YOUR_REPO_NAME
-    ```
-
-2. **Install dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3. **Set up environment variables**
-
-    Create a `.env` file in the project root:
-    ```env
-    GITHUB_CLIENT_ID=your_github_oauth_client_id
-    GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
-    GITHUB_CALLBACK_URL=http://localhost:3000/auth/callback
-    FLASK_SECRET_KEY=your_super_secret_key
-    ```
-
-4. **Run the app**
-    ```bash
-    flask run
-    ```
-    Or, for development with auto-reload:
-    ```bash
-    FLASK_ENV=development flask run
-    ```
-
-5. **Visit**
-    - Go to [http://localhost:3000](http://localhost:3000) in your browser.
-
 
 ## 🛡️ Security & Privacy
 
