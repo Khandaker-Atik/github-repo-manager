@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyo
+*.pyd
+*.db
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
+
+# Log files
+*.log
+
+# Ignore everything in root .env except allow .env to be tracked
+# (This will NOT ignore the .env file itself, but will ignore .env.* files)
+.env.*
+!.env
