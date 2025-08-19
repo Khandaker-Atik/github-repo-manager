@@ -34,3 +34,5 @@ Thumbs.db
 # (This will NOT ignore the .env file itself, but will ignore .env.* files)
 .env.*
 !.env
+.ENV
+.env
