@@ -109,6 +109,70 @@
       z-index: 10;
       border-radius: 0 22px 22px 0;
       box-shadow: 2px 0 18px #e3e9f7a0;
+      transition: all 0.3s;
+    }
+    @media (max-width: 900px) {
+      .app {
+        flex-direction: column;
+      }
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-radius: 0 0 22px 22px;
+        box-shadow: 0 2px 18px #e3e9f7a0;
+        border-right: none;
+        border-bottom: 1.5px solid #e3e8f3;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1.2rem;
+        padding: 1rem 0.7rem;
+        margin-bottom: 1rem;
+      }
+      .user-card {
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 0;
+        min-width: 0;
+        flex: 1;
+      }
+      .stats-grid {
+        flex: 2;
+        min-width: 0;
+        margin-bottom: 0;
+      }
+      .logout-btn {
+        margin-top: 0;
+        align-self: flex-end;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .sidebar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+        padding: 0.7rem 0.3rem;
+        border-radius: 0 0 16px 16px;
+      }
+      .user-card {
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        justify-content: flex-start;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 0.7rem;
+      }
+      .stats-grid {
+        margin-bottom: 0.5rem;
+      }
     }
 
     .user-card {
@@ -807,37 +871,37 @@
       text-align:center;
     }
     .login-title-main {
-      font-size:2.15rem;
+      font-size:2.35rem;
       color:#24292e;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:-1.2px;
       display:flex;
       align-items:center;
-      gap:10px;
-      margin-bottom: 0.7rem;
+      gap:12px;
+      margin-bottom: 0.9rem;
       animation: fadeInDown 0.7s cubic-bezier(.23,1.01,.32,1);
     }
     .login-desc-main {
       color:#666;
-      margin-bottom:32px;
-      font-size:1.07rem;
+      margin-bottom:38px;
+      font-size:1.18rem;
       animation: fadeInDown 0.9s 0.1s both;
     }
     .login-btn-main {
-      margin-bottom: 30px;
+      margin-bottom: 36px;
       background: #2563eb;
       color: #fff;
       border:none;
-      padding:12px 30px;
-      border-radius:40px;
-      font-size:1.08rem;
+      padding:15px 38px;
+      border-radius:44px;
+      font-size:1.18rem;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
-      gap:10px;
-      font-weight:600;
+      gap:12px;
+      font-weight:700;
       transition:.2s;
-      box-shadow: 0 2px 8px #e5e7eb;
+      box-shadow: 0 2px 12px #e5e7eb;
       animation: fadeInUp 0.8s 0.2s both;
     }
     .login-btn-main:hover { background: #193ea1; }
