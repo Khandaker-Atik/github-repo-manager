@@ -55,6 +55,3 @@ Email: [Khandakeratik43@gmail.com](mailto:Khandakeratik43@gmail.com)
 
 ---
 
-## 📄 License
-
-[MIT License](LICENSE)

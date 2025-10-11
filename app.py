@@ -84,6 +84,24 @@ def get_repos():
     repos = sort_repos(repos, sort_by, order)
     return jsonify(repos)
 
+@app.route("/api/public-repos/<username>")
+def get_public_repos(username):
+    """Get public repositories for any GitHub user (no auth required)"""
+    sort_by = request.args.get("sort_by", "updated")  # name, created, updated
+    order = request.args.get("order", "desc")         # asc, desc
+    
+    # Fetch public repos from GitHub API (no authentication needed)
+    r = requests.get(f"{GITHUB_API}/users/{quote(username)}/repos?per_page=100&type=public")
+    
+    if r.status_code == 404:
+        return jsonify({"error": "User not found"}), 404
+    elif r.status_code != 200:
+        return jsonify({"error": "Failed to fetch repositories"}), r.status_code
+    
+    repos = r.json()
+    repos = sort_repos(repos, sort_by, order)
+    return jsonify(repos)
+
 @app.route("/api/repo/<owner>/<repo>/visibility", methods=["PATCH"])
 def change_repo_visibility(owner, repo):
     token = get_token()

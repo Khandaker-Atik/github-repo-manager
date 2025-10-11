@@ -849,7 +849,39 @@
     <button class="btn login-btn-main" onclick="window.location='/auth/login'">
       <i class="fab fa-github"></i> Login with GitHub
     </button>
-    <br><br>
+    
+    <div style="margin: 2rem 0; width: 100%; max-width: 500px;">
+      <div style="text-align: center; margin-bottom: 1rem; color: #666;">
+        <span style="font-size: 0.9rem;">OR</span>
+      </div>
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+        <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: #24292e;">
+          <i class="fas fa-search"></i> View Public Repositories
+        </h3>
+        <div style="display: flex; gap: 0.5rem;">
+          <input 
+            type="text" 
+            id="publicUsernameInput" 
+            placeholder="Enter GitHub username..." 
+            style="flex: 1; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; outline: none;"
+            onkeypress="if(event.key==='Enter') searchPublicRepos()"
+          />
+          <button 
+            onclick="searchPublicRepos()" 
+            style="background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;"
+            onmouseover="this.style.background='#1d4ed8'" 
+            onmouseout="this.style.background='#2563eb'"
+          >
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #64748b;">
+          Browse any GitHub user's public repositories without logging in
+        </p>
+      </div>
+    </div>
+    
+    <br>
     <footer>
       Developed by <span style="color:#28282a;font-weight:600">Khandaker Atik</span> | 
       Portfolio: <a href="https://khandaker-atik.vercel.app">khandaker-atik.vercel.app</a>
@@ -943,6 +975,72 @@
       }
     }
   </style>
+
+  <!-- Public Repo Viewer -->
+  <div id="publicViewer" style="display:none; min-height: 100vh; padding: 2rem;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="margin: 0; font-size: 1.8rem; color: #24292e;">
+            <i class="fab fa-github"></i> <span id="publicUsername"></span>'s Public Repositories
+          </h2>
+          <p style="margin: 0.5rem 0 0 0; color: #64748b;" id="publicRepoCount">Loading...</p>
+        </div>
+        <button 
+          onclick="backToHome()" 
+          style="background: #f1f5f9; color: #334155; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;"
+          onmouseover="this.style.background='#e2e8f0'" 
+          onmouseout="this.style.background='#f1f5f9'"
+        >
+          <i class="fas fa-arrow-left"></i> Back to Home
+        </button>
+      </div>
+      
+      <div class="controls" style="margin-bottom: 2rem;">
+        <div class="search-row">
+          <input type="text" id="publicSearchBox" class="search-input" placeholder="🔍 Search repositories..." oninput="filterPublicRepos()">
+          <select id="publicLanguageFilter" class="filter-select" onchange="filterPublicRepos()">
+            <option value="all">All Languages</option>
+          </select>
+          <select id="publicSortFilter" class="filter-select" onchange="loadPublicRepos()">
+            <option value="updated-desc">Recently Updated</option>
+            <option value="updated-asc">Least Recently Updated</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="created-desc">Newest Created</option>
+            <option value="created-asc">Oldest Created</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="repo-grid" id="publicRepoList"></div>
+      
+      <div class="empty-state" id="publicEmptyState" style="display:none;">
+        <i class="fas fa-search"></i>
+        <h3>No repositories found</h3>
+        <p>Try adjusting your search or filters</p>
+      </div>
+      
+      <div id="publicLoadingState" style="text-align: center; padding: 4rem 2rem; color: #64748b;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>Loading repositories...</p>
+      </div>
+      
+      <div id="publicErrorState" style="display:none; text-align: center; padding: 4rem 2rem; color: #64748b;">
+        <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 1rem; color: #dc2626;"></i>
+        <h3 style="color: #334155;">User not found</h3>
+        <p>Please check the username and try again</p>
+        <button 
+          onclick="backToHome()" 
+          style="background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 1rem; transition: 0.2s;"
+          onmouseover="this.style.background='#1d4ed8'" 
+          onmouseout="this.style.background='#2563eb'"
+        >
+          <i class="fas fa-arrow-left"></i> Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Main Dashboard -->
   <div class="app" id="dashboard" style="display:none;">
@@ -1055,6 +1153,11 @@
     let selectedRepos = new Set();
     let user = null;
     let modalRepo = null;
+    
+    // Public repo viewer state
+    let publicRepos = [];
+    let filteredPublicRepos = [];
+    let currentPublicUsername = '';
 
     function fetchMeAndShow() {
       fetch('/api/me').then(r => r.ok ? r.json() : null).then(u => {
@@ -1361,6 +1464,137 @@
     document.getElementById('deleteModalBg').onclick = function(e) {
       if (e.target === this) closeDeleteModal();
     };
+
+    // Public Repo Viewer Functions
+    function searchPublicRepos() {
+      const username = document.getElementById('publicUsernameInput').value.trim();
+      if (!username) {
+        showToast('Please enter a GitHub username', 'error');
+        return;
+      }
+      
+      currentPublicUsername = username;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('publicViewer').style.display = 'block';
+      document.getElementById('publicUsername').textContent = username;
+      document.getElementById('publicLoadingState').style.display = 'block';
+      document.getElementById('publicRepoList').style.display = 'none';
+      document.getElementById('publicEmptyState').style.display = 'none';
+      document.getElementById('publicErrorState').style.display = 'none';
+      
+      loadPublicRepos();
+    }
+    
+    function loadPublicRepos() {
+      if (!currentPublicUsername) return;
+      
+      const sortVal = document.getElementById('publicSortFilter') ? document.getElementById('publicSortFilter').value : "updated-desc";
+      let sort_by = "updated", order = "desc";
+      if(sortVal) {
+        const [s, o] = sortVal.split("-");
+        sort_by = s; order = o;
+      }
+      
+      fetch(`/api/public-repos/${encodeURIComponent(currentPublicUsername)}?sort_by=${sort_by}&order=${order}`)
+        .then(r => {
+          if (!r.ok) throw new Error('User not found');
+          return r.json();
+        })
+        .then(rps => {
+          publicRepos = rps;
+          filteredPublicRepos = publicRepos;
+          document.getElementById('publicLoadingState').style.display = 'none';
+          document.getElementById('publicRepoList').style.display = 'grid';
+          document.getElementById('publicRepoCount').textContent = `${publicRepos.length} public repositories`;
+          populatePublicLanguageFilter();
+          filterPublicRepos();
+        })
+        .catch(err => {
+          document.getElementById('publicLoadingState').style.display = 'none';
+          document.getElementById('publicErrorState').style.display = 'block';
+        });
+    }
+    
+    function populatePublicLanguageFilter() {
+      const languages = [...new Set(publicRepos.map(r => r.language).filter(Boolean))];
+      const languageFilter = document.getElementById('publicLanguageFilter');
+      languageFilter.innerHTML = '<option value="all">All Languages</option>';
+      languages.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang;
+        option.textContent = lang;
+        languageFilter.appendChild(option);
+      });
+    }
+    
+    function filterPublicRepos() {
+      const searchTerm = document.getElementById('publicSearchBox').value.toLowerCase();
+      const language = document.getElementById('publicLanguageFilter').value;
+      
+      filteredPublicRepos = publicRepos.filter(repo => {
+        const matchesSearch = repo.name.toLowerCase().includes(searchTerm) ||
+          (repo.description && repo.description.toLowerCase().includes(searchTerm));
+        const matchesLanguage = language === 'all' || repo.language === language;
+        return matchesSearch && matchesLanguage;
+      });
+      
+      renderPublicRepos();
+    }
+    
+    function renderPublicRepos() {
+      const repoList = document.getElementById('publicRepoList');
+      const emptyState = document.getElementById('publicEmptyState');
+      
+      if (!filteredPublicRepos.length) {
+        repoList.innerHTML = '';
+        repoList.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      repoList.style.display = 'grid';
+      repoList.innerHTML = filteredPublicRepos.map((repo, index) => `
+        <div class="repo-card" 
+             style="animation-delay: ${index * 0.05}s; cursor: default;">
+          <div class="repo-header">
+            <div class="repo-title-section">
+              <div class="repo-name">
+                <i class="fab fa-github"></i>
+                ${repo.name}
+              </div>
+              <span class="repo-visibility public">
+                <i class="fas fa-globe"></i>
+                Public
+              </span>
+            </div>
+            <div class="repo-actions">
+              <button class="action-btn view" 
+                      onclick="viewRepo('${repo.html_url}')" 
+                      title="View Repository on GitHub">
+                <i class="fas fa-eye"></i> <span class="btn-label">View</span>
+              </button>
+            </div>
+          </div>
+          ${repo.description ? `<div class="repo-description">${repo.description}</div>` : ''}
+          <div class="repo-meta">
+            ${repo.language ? `<span><i class='fas fa-circle' style='color: #${getLanguageColor(repo.language)}'></i> ${repo.language}</span>` : ''}
+            <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
+            <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+            <span><i class="fas fa-clock"></i> ${timeAgo(repo.updated_at)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function backToHome() {
+      document.getElementById('publicViewer').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('publicUsernameInput').value = '';
+      currentPublicUsername = '';
+      publicRepos = [];
+      filteredPublicRepos = [];
+    }
 
     // Initialize app
     fetchMeAndShow();
